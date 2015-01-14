@@ -1,8 +1,8 @@
-from scrapy.item import Item, Field
+import scrapy
 
 
-class Website(Item):
-
-    name = Field()
-    description = Field()
-    url = Field()
+class TorrentItem(scrapy.Item):
+    url = scrapy.Field()
+    name = scrapy.Field()
+    description = scrapy.Field()
+    size = scrapy.Field()
