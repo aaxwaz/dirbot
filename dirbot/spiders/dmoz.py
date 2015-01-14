@@ -1,34 +1,18 @@
-from scrapy.spider import Spider
-from scrapy.selector import Selector
+from scrapy.contrib.spiders import CrawlSpider, Rule
+from scrapy.contrib.linkextractors import LinkExtractor
+from torrent.items import TorrentItem
 
-from dirbot.items import Website
+class MininovaSpider(CrawlSpider):
 
+    name = 'mininova'
+    allowed_domains = ['mininova.org']
+    start_urls = ['http://www.mininova.org/yesterday']
+    rules = [Rule(LinkExtractor(allow=['/tor/\d+']), 'parse_torrent')]
 
-class DmozSpider(Spider):
-    name = "dmoz"
-    allowed_domains = ["dmoz.org"]
-    start_urls = [
-        "http://www.dmoz.org/Computers/Programming/Languages/Python/Books/",
-        "http://www.dmoz.org/Computers/Programming/Languages/Python/Resources/",
-    ]
-
-    def parse(self, response):
-        """
-        The lines below is a spider contract. For more info see:
-        http://doc.scrapy.org/en/latest/topics/contracts.html
-
-        @url http://www.dmoz.org/Computers/Programming/Languages/Python/Resources/
-        @scrapes name
-        """
-        sel = Selector(response)
-        sites = sel.xpath('//ul[@class="directory-url"]/li')
-        items = []
-
-        for site in sites:
-            item = Website()
-            item['name'] = site.xpath('a/text()').extract()
-            item['url'] = site.xpath('a/@href').extract()
-            item['description'] = site.xpath('text()').re('-\s[^\n]*\\r')
-            items.append(item)
-
-        return items
+    def parse_torrent(self, response):
+        torrent = TorrentItem()
+        torrent['url'] = response.url
+        torrent['name'] = response.xpath("//h1/text()").extract()
+        torrent['description'] = response.xpath("//div[@id='description']").extract()
+        torrent['size'] = response.xpath("//div[@id='info-left']/p[2]/text()[2]").extract()
+        return torrent
