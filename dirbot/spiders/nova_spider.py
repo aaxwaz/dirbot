@@ -1,6 +1,6 @@
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors import LinkExtractor
-from torrent.items import TorrentItem
+from dirbot.items import TorrentItem
 
 class MininovaSpider(CrawlSpider):
 
